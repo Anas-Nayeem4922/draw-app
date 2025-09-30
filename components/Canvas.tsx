@@ -1,19 +1,18 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { toast } from "sonner";
 import { useSocket } from "@/hooks/SocketProvider";
-import { Button } from "./ui/button";
-
-interface Shape {
-  shape: string
-  shapeDetails: string
-}
+import { DrawingCanvas } from "@/app/draw/DrawingCanvas";
+import { Shape } from "@/types/canvas.types";
 
 export default function Canvas({ roomId }: { roomId: string }) {
-  const [shapes, setShapes] = useState<Shape[]>([])
-  const socket = useSocket()
+  const [shapes, setShapes] = useState<Shape[]>([]);
+  const [selectedShape, setSelectedShape] = useState<string>("line");
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const socket = useSocket();
 
   const fetchShapes = async () => {
     const response = await axios.get(`/api/shape?roomId=${roomId}`)
@@ -29,6 +28,7 @@ export default function Canvas({ roomId }: { roomId: string }) {
   }
 
   const addShape = async (shape: string, shapeDetails: string) => {
+    if (!shapeDetails) return;
 
     await axios.post("/api/shape", {
       shape,
@@ -47,6 +47,18 @@ export default function Canvas({ roomId }: { roomId: string }) {
     })
     if (socket) socket.send(message)
   }
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      const c = new DrawingCanvas(canvasRef.current, shapes, selectedShape);
+
+      c.onShapeComplete = (shape, details) => {
+        addShape(shape, details);
+      };
+
+      return () => c.destroy();
+    }
+  }, [selectedShape, shapes])
 
   useEffect(() => {
     if (!socket) return
@@ -75,24 +87,16 @@ export default function Canvas({ roomId }: { roomId: string }) {
   }, [socket, roomId])
 
   useEffect(() => {
+    if(canvasRef.current) {
+      canvasRef.current.height = window.innerHeight;
+      canvasRef.current.width = window.innerWidth;
+    }
     fetchShapes()
   }, [])
 
   return (
     <div>
-      {shapes?.map((s, id) => (
-        <div key={id}>
-          <h1 className="font-bold">
-            {id}: <span className="text-xl text-cherry">{s.shape}</span>
-          </h1>
-        </div>
-      ))}
-      <Button
-        className="mt-10"
-        onClick={() => addShape("circle", "Circle detail")}
-      >
-        Click me to add + sync shape
-      </Button>
+      <canvas ref={canvasRef} className="bg-red-300"/>
     </div>
   )
 }
