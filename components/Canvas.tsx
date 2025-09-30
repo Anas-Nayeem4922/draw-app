@@ -7,85 +7,92 @@ import { useSocket } from "@/hooks/SocketProvider";
 import { Button } from "./ui/button";
 
 interface Shape {
-    shape: string,
-    shapeDetails: string
+  shape: string
+  shapeDetails: string
 }
 
-export default function Canvas({roomId} : {roomId: string}) {
-    const [shapes, setShapes] = useState<Shape[]>([]);
-    const socket = useSocket();
+export default function Canvas({ roomId }: { roomId: string }) {
+  const [shapes, setShapes] = useState<Shape[]>([])
+  const socket = useSocket()
 
-    const fetchShapes = async () => {
-        const response = await axios.get(`/api/shape?roomId=${roomId}`);
-        if (response.data.shapes) {
-            const mapped = response.data.shapes.map((s: any) => ({
-                shape: s.name,
-                shapeDetails: s.details,
-            }));
-            setShapes(mapped);
-        } else {
-            toast.error(response.data.message);
-        }
-    };
+  const fetchShapes = async () => {
+    const response = await axios.get(`/api/shape?roomId=${roomId}`)
+    if (response.data.shapes) {
+      const mapped = response.data.shapes.map((s: any) => ({
+        shape: s.name,
+        shapeDetails: s.details,
+      }))
+      setShapes(mapped)
+    } else {
+      toast.error(response.data.message)
+    }
+  }
 
-    const addShape = async (shape: string, shapeDetails: string) => {
-        await axios.post("/api/shape", {
-            shape,
-            shapeDetails,
-            roomId
-        })
+  const addShape = async (shape: string, shapeDetails: string) => {
+
+    await axios.post("/api/shape", {
+      shape,
+      shapeDetails,
+      roomId,
+    })
+
+    setShapes((s) => [...s, { shape, shapeDetails }])
+
+    const message = JSON.stringify({
+      type: "shape",
+      payload: {
+        roomId,
+        shape: { name: shape, details: shapeDetails },
+      },
+    })
+    if (socket) socket.send(message)
+  }
+
+  useEffect(() => {
+    if (!socket) return
+
+    const joinMsg = JSON.stringify({
+      type: "join",
+      payload: { roomId },
+    })
+
+    if (socket.readyState === WebSocket.OPEN) {
+      socket.send(joinMsg)
+    } else {
+      socket.onopen = () => socket.send(joinMsg)
     }
 
-    const sendMessage = () => {
-        const message = JSON.stringify({
-            type: "shape",
-            payload: {
-                roomId,
-                shape: {
-                    name: "circle",
-                    details: "Circle detail"
-                }
-            }
-        })
-        if(socket) {
-            socket.send(message);
+    socket.onmessage = (e) => {
+      try {
+        const { shape, shapeDetails } = JSON.parse(e.data)
+        if (shape && shapeDetails) {
+          setShapes((s) => [...s, { shape, shapeDetails }])
         }
+      } catch (err) {
+        console.error("Invalid WS message:", e.data)
+      }
     }
+  }, [socket, roomId])
 
-    useEffect(() => {
-        if (socket) {
-            // send join message when connection opens
-            socket.onopen = () => {
-                const message = JSON.stringify({
-                    type: "join",
-                    payload: { roomId }
-                });
-                console.log(message);
-                socket.send(message);
-            };
+  useEffect(() => {
+    fetchShapes()
+  }, [])
 
-            // listen for incoming messages
-            socket.onmessage = (e) => {
-                const { shape, shapeDetails } = JSON.parse(e.data);
-                setShapes(s => [...s, { shape, shapeDetails }]);
-                addShape(shape, shapeDetails);
-            };
-        }
-    }, [socket]);
-
-    useEffect(() => {
-        fetchShapes();
-    }, []);
-
-    return (
-        <div>
-            {shapes?.map((s, id) => (
-                <div key={id}>
-                    <div className="text-xl text-cherry">{s.shape}</div>
-                    <div className="text-turmeric">{s.shapeDetails}</div>
-                </div>
-            ))}
-            <Button onClick={sendMessage}>Click me to send message</Button>
+  return (
+    <div>
+      {shapes?.map((s, id) => (
+        <div key={id}>
+          <h1 className="font-bold">
+            {id}: <span className="text-xl text-cherry">{s.shape}</span>
+          </h1>
         </div>
-    )
+      ))}
+      <Button
+        className="mt-10"
+        onClick={() => addShape("circle", "Circle detail")}
+      >
+        Click me to add + sync shape
+      </Button>
+    </div>
+  )
 }
