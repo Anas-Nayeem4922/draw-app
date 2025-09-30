@@ -6,10 +6,13 @@ import { toast } from "sonner";
 import { useSocket } from "@/hooks/SocketProvider";
 import { DrawingCanvas } from "@/app/draw/DrawingCanvas";
 import { Shape } from "@/types/canvas.types";
+import { Circle, Minus, MousePointer, MoveUpRight, Pencil, RectangleHorizontal } from "lucide-react";
+import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 
 export default function Canvas({ roomId }: { roomId: string }) {
   const [shapes, setShapes] = useState<Shape[]>([]);
-  const [selectedShape, setSelectedShape] = useState<string>("line");
+  const [selectedShape, setSelectedShape] = useState<string>("select");
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const socket = useSocket();
@@ -94,8 +97,32 @@ export default function Canvas({ roomId }: { roomId: string }) {
     fetchShapes()
   }, [])
 
+  const tools = [
+        { id: "select", icon: MousePointer, label: "Select" },
+        { id: "circle", icon: Circle, label: "Circle" },
+        { id: "line", icon: Minus, label: "Line" },
+        { id: "rectangle", icon: RectangleHorizontal, label: "Rectangle" },
+        { id: "arrow", icon: MoveUpRight, label: "Arrow"},
+        { id: "pencil", icon: Pencil, label: "Pencil" }
+    ] as const;
+
   return (
     <div>
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm rounded-lg shadow-lg p-1.5 flex items-center gap-1 z-10">
+                {tools.map((tool) => (
+                    <Button
+                        key={tool.id}
+                        variant={selectedShape === tool.id ? "secondary" : "ghost"}
+                        size="icon"
+                        className={cn("h-9 w-9 rounded-md", selectedShape === tool.id && "bg-muted shadow-inner")}
+                        onClick={() => setSelectedShape(tool.id)}
+                        title={tool.label}
+                    >
+                        <tool.icon className="h-5 w-5" />
+                        <span className="sr-only">{tool.label}</span>
+                    </Button>
+                ))}
+            </div>
       <canvas ref={canvasRef} className="bg-red-300"/>
     </div>
   )
