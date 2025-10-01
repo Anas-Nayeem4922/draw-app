@@ -109,20 +109,20 @@ export default function Canvas({ roomId }: { roomId: string }) {
   return (
     <div>
       <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm rounded-lg shadow-lg p-1.5 flex items-center gap-1 z-10">
-                {tools.map((tool) => (
-                    <Button
-                        key={tool.id}
-                        variant={selectedShape === tool.id ? "secondary" : "ghost"}
-                        size="icon"
-                        className={cn("h-9 w-9 rounded-md", selectedShape === tool.id && "bg-muted shadow-inner")}
-                        onClick={() => setSelectedShape(tool.id)}
-                        title={tool.label}
-                    >
-                        <tool.icon className="h-5 w-5" />
-                        <span className="sr-only">{tool.label}</span>
-                    </Button>
-                ))}
-            </div>
+          {tools.map((tool) => (
+              <Button
+                  key={tool.id}
+                  variant={selectedShape === tool.id ? "secondary" : "ghost"}
+                  size="icon"
+                  className={cn("h-9 w-9 rounded-md", selectedShape === tool.id && "bg-muted shadow-inner")}
+                  onClick={() => setSelectedShape(tool.id)}
+                  title={tool.label}
+              >
+                  <tool.icon className="h-5 w-5" />
+                  <span className="sr-only">{tool.label}</span>
+              </Button>
+          ))}
+      </div>
       <canvas ref={canvasRef} className="bg-red-300"/>
     </div>
   )

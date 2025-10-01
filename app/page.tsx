@@ -1,7 +1,7 @@
-import Link from "next/link";
+import { SidebarComponent } from "@/components/Sidebar";
 
 export default function Home() {
-  return <div>
-    <Link href={"/room"}>ROOM</Link>
+  return <div className="h-screen w-full">
+    <SidebarComponent/>
   </div>
 }
