@@ -20,6 +20,7 @@ import Link from "next/link"
 import { signIn } from "next-auth/react"
 import { motion } from "framer-motion"
 import { authSchema } from "@/schema/auth"
+import Splash3dButton from "@/components/ui/3d-splash-button"
 
 export default function Signin() {
     const router = useRouter()
@@ -77,7 +78,7 @@ export default function Signin() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-pearl to-butter flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-b from-zinc-950 from-60% to-zinc-800 flex items-center justify-center p-4">
             <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -87,7 +88,7 @@ export default function Signin() {
                 }}
                 className="w-full max-w-md"
             >
-                <div className="bg-white rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] p-8">
+                <div className="bg-zinc-900 border border-zinc-800 rounded-xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] p-8">
                     <motion.div 
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -98,7 +99,7 @@ export default function Signin() {
                         }}
                         className="text-center space-y-2 mb-8"
                     >
-                        <h1 className="text-3xl font-bold text-cherry">
+                        <h1 className="text-3xl font-bold text-white">
                             Welcome Back
                         </h1>
                         <p className="text-slate-400">
@@ -120,15 +121,17 @@ export default function Signin() {
                                     name="username"
                                     render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-slate-900 font-semibold">Username</FormLabel>
+                                            <FormLabel className="text-zinc-300 font-semibold">Username</FormLabel>
                                             <FormControl>
                                                 <Input 
                                                     placeholder="Enter your username" 
-                                                    className="bg-white border-cherry focus-visible:border-cherry focus-visible:ring-cherry/50 text-slate-700 placeholder-gray-500 h-11 transition-all duration-200"
+                                                    className="bg-zinc-800 
+                                                    border border-zinc-700 
+                                                    text-zinc-100 focus-visible:border-zinc-600 focus-visible:ring-zinc-600 placeholder-zinc-500 h-12 transition-all duration-200"
                                                     {...field} 
                                                 />
                                             </FormControl>
-                                            <FormMessage className="text-cherry" />
+                                            <FormMessage className="text-zinc-100"/>
                                         </FormItem>
                                     )}
                                 />
@@ -140,16 +143,18 @@ export default function Signin() {
                                     name="password"
                                     render={({ field }) => (
                                         <FormItem className="space-y-2">
-                                            <FormLabel className="text-slate-900 font-semibold">Password</FormLabel>
+                                            <FormLabel className="text-zinc-300 font-semibold">Password</FormLabel>
                                             <FormControl>
                                                 <Input 
                                                     type="password" 
                                                     placeholder="Enter your password" 
-                                                    className="bg-white border-cherry focus-visible:border-cherry focus-visible:ring-cherry/50 text-slate-700 placeholder-gray-500 h-11 transition-all duration-200"
+                                                    className="bg-zinc-800 
+                                                    border border-zinc-700 
+                                                    text-zinc-100 focus-visible:border-zinc-600 focus-visible:ring-zinc-600 placeholder-zinc-500 h-12 transition-all duration-200"
                                                     {...field} 
                                                 />
                                             </FormControl>
-                                            <FormMessage className="text-cherry" />
+                                            <FormMessage className="text-zinc-100" />
                                         </FormItem>
                                     )}
                                 />
@@ -159,8 +164,7 @@ export default function Signin() {
                                 variants={itemVariants}
                                 className="pt-2"
                             >
-                                <Button 
-                                    className="w-full bg-cherry/90 hover:bg-cherry text-white font-medium h-11 transition-all duration-300 shadow-sm cursor-pointer"
+                                <Splash3dButton
                                     type="submit"
                                     disabled={form.formState.isSubmitting}
                                 >
@@ -184,7 +188,7 @@ export default function Signin() {
                                             <span>Sign In</span>
                                         </motion.div>
                                     )}
-                                </Button>
+                                </Splash3dButton>
                             </motion.div>
                         </motion.form>
                     </Form>
@@ -193,13 +197,13 @@ export default function Signin() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.7, duration: 0.5 }}
-                        className="mt-6 text-center text-slate-900"
+                        className="mt-6 text-center text-zinc-100"
                     >
                         <p>
-                            Don&apos;t have an account?{' '}
+                            <span className="mr-1">Don&apos;t have an account?{' '}</span>
                             <Link 
                                 href="/signup" 
-                                className="text-cherry/95 hover:text-cherry hover:underline hover:font-medium transition-all duration-100"
+                                className="text-lg text-radicchio/95 hover:text-radicchio hover:underline font-semibold hover:font-bold transition-all duration-100"
                             >
                                 Sign up
                             </Link>

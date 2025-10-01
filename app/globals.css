@@ -70,6 +70,11 @@
   --color-radicchio: #c2512f;
   --color-cherrylite: #ffc2cc;
   --color-pink: #fe92a3;
+  --color-d-sheet: var(--d-sheet);
+  --color-d-border: var(--d-border);
+  --color-d-fg: var(--d-fg);
+  --color-d-muted: var(--d-muted);
+  --color-d-bg: var(--d-bg);
 }
 
 :root {
@@ -105,6 +110,11 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.705 0.015 286.067);
+  --d-bg: hsl(0 0% 100%);
+  --d-muted: hsl(0 0% 90%);
+  --d-fg: hsl(0 0% 0%);
+  --d-border: hsl(0 0% 90%);
+  --d-sheet: hsl(0 0% 98%);
 }
 
 .dark {
@@ -139,6 +149,11 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.552 0.016 285.938);
+  --d-bg: hsl(0 0% 10%);
+  --d-muted: hsl(0 0% 20%);
+  --d-fg: hsl(0 0% 100%);
+  --d-border: hsl(0 0% 20%);
+  --d-sheet: hsl(0 0% 12%);
 }
 
 @layer base {

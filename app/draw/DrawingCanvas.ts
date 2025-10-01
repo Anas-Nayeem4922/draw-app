@@ -26,6 +26,10 @@ export class DrawingCanvas {
         this.selectedShape = selectedShape;
         this.shapeDetails = "";
         this.points = [];
+        this.ctx.strokeStyle = "#ffffff";
+        this.ctx.lineWidth = 2;
+        this.ctx.lineCap = "round";
+
         this.init();
         this.initMouseHandlers();
     }
@@ -41,11 +45,13 @@ export class DrawingCanvas {
                     this.ctx.beginPath();
                     this.ctx.moveTo(startX, startY);
                     this.ctx.lineTo(endX, endY);
+                    this.ctx.strokeStyle = "#ffffff";
                     this.ctx.stroke();
                     break;
                 }
                 case "rectangle": {
                     const { startX, startY, height, width } = data;
+                    this.ctx.strokeStyle = "#ffffff";
                     this.ctx.strokeRect(startX, startY, width, height);
                     break;
                 }
@@ -53,6 +59,7 @@ export class DrawingCanvas {
                     const { startX, startY, radius } = data;
                     this.ctx.beginPath();
                     this.ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                    this.ctx.strokeStyle = "#ffffff";
                     this.ctx.stroke();
                     break;
                 }
@@ -61,6 +68,7 @@ export class DrawingCanvas {
                     this.ctx.beginPath();
                     this.ctx.moveTo(startX, startY);
                     this.ctx.lineTo(endX, endY);
+                    this.ctx.strokeStyle = "#ffffff";
                     this.ctx.stroke();
                     const arrowHeadSize = 15;
                     const angle = Math.atan2(endY - startY, endX - startX);
@@ -90,6 +98,7 @@ export class DrawingCanvas {
                             this.ctx.lineTo(point.x, point.y);
                         }
                     });
+                    this.ctx.strokeStyle = "#ffffff";
                     this.ctx.stroke();
                     break;
                 }
@@ -120,10 +129,12 @@ export class DrawingCanvas {
                 this.ctx.beginPath();
                 this.ctx.moveTo(startX, startY);
                 this.ctx.lineTo(e.offsetX, e.offsetY);
+                this.ctx.strokeStyle = "#ffffff";
                 this.ctx.stroke();
                 break;
             }
             case "rectangle": {
+                this.ctx.strokeStyle = "#ffffff";
                 this.ctx.strokeRect(
                     startX,
                     startY,
@@ -139,6 +150,7 @@ export class DrawingCanvas {
                 );
                 this.ctx.beginPath();
                 this.ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+                this.ctx.strokeStyle = "#ffffff";
                 this.ctx.stroke();
                 break;
             }
@@ -148,6 +160,7 @@ export class DrawingCanvas {
                 this.ctx.beginPath();
                 this.ctx.moveTo(startX, startY);
                 this.ctx.lineTo(endX, endY);
+                this.ctx.strokeStyle = "#ffffff";
                 this.ctx.stroke();
                 const arrowHeadSize = 15;
                 const angle = Math.atan2(endY - startY, endX - startX);
@@ -170,7 +183,7 @@ export class DrawingCanvas {
             case "pencil": {
                 this.ctx.lineTo(e.offsetX, e.offsetY);
                 this.points?.push({ x: e.offsetX, y: e.offsetY });
-                this.ctx.strokeStyle = "#000000";
+                this.ctx.strokeStyle = "#ffffff";
                 this.ctx.lineWidth = 2;
                 this.ctx.lineCap = "round";
                 this.ctx.stroke();

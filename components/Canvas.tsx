@@ -6,13 +6,14 @@ import { toast } from "sonner";
 import { useSocket } from "@/hooks/SocketProvider";
 import { DrawingCanvas } from "@/app/draw/DrawingCanvas";
 import { Shape } from "@/types/canvas.types";
-import { Circle, Minus, MousePointer, MoveUpRight, Pencil, RectangleHorizontal } from "lucide-react";
+import { Check, Circle, Copy, Minus, MousePointer, MoveUpRight, Pencil, RectangleHorizontal } from "lucide-react";
+import { FloatingDock } from "./ui/floating-dock";
 import { Button } from "./ui/button";
-import { cn } from "@/lib/utils";
 
 export default function Canvas({ roomId }: { roomId: string }) {
   const [shapes, setShapes] = useState<Shape[]>([]);
   const [selectedShape, setSelectedShape] = useState<string>("select");
+  const [copied, setCopied] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const socket = useSocket();
@@ -90,40 +91,46 @@ export default function Canvas({ roomId }: { roomId: string }) {
   }, [socket, roomId])
 
   useEffect(() => {
-    if(canvasRef.current) {
+    if (canvasRef.current) {
       canvasRef.current.height = window.innerHeight;
       canvasRef.current.width = window.innerWidth;
     }
     fetchShapes()
   }, [])
 
+  const copyRoomId = async () => {
+        await navigator.clipboard.writeText(roomId);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
   const tools = [
-        { id: "select", icon: MousePointer, label: "Select" },
-        { id: "circle", icon: Circle, label: "Circle" },
-        { id: "line", icon: Minus, label: "Line" },
-        { id: "rectangle", icon: RectangleHorizontal, label: "Rectangle" },
-        { id: "arrow", icon: MoveUpRight, label: "Arrow"},
-        { id: "pencil", icon: Pencil, label: "Pencil" }
-    ] as const;
+    { icon: <MousePointer />, title: "select" },
+    { icon: <Circle />, title: "circle" },
+    { icon: <Minus />, title: "line" },
+    { icon: <RectangleHorizontal />, title: "rectangle" },
+    { icon: <MoveUpRight />, title: "arrow" },
+    { icon: <Pencil />, title: "pencil" }
+  ];
 
   return (
     <div>
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-background/90 backdrop-blur-sm rounded-lg shadow-lg p-1.5 flex items-center gap-1 z-10">
-          {tools.map((tool) => (
-              <Button
-                  key={tool.id}
-                  variant={selectedShape === tool.id ? "secondary" : "ghost"}
-                  size="icon"
-                  className={cn("h-9 w-9 rounded-md", selectedShape === tool.id && "bg-muted shadow-inner")}
-                  onClick={() => setSelectedShape(tool.id)}
-                  title={tool.label}
-              >
-                  <tool.icon className="h-5 w-5" />
-                  <span className="sr-only">{tool.label}</span>
-              </Button>
-          ))}
+      <div className="flex justify-center fixed bottom-0 left-0 right-0 pb-4">
+        <FloatingDock 
+          onClick={setSelectedShape} 
+          items={tools} 
+          selected={selectedShape}
+          desktopClassName="mt-32" 
+        />
       </div>
-      <canvas ref={canvasRef} className="bg-red-300"/>
+      <canvas ref={canvasRef} className="bg-zinc-900" />
+      <div className="bg-zinc-900 mt-18 md:mt-0 fixed top-2 right-4 p-4 backdrop-blur-sm rounded-lg shadow-lg flex items-center z-50 gap-2">
+          <span className="text-sm font-medium text-zinc-100">Room ID:</span>
+                <code className="bg-zinc-950 px-2 py-1 rounded text-sm">{roomId}</code>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={copyRoomId} title="Copy room ID">
+                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                </Button>
+      </div>
     </div>
   )
 }
