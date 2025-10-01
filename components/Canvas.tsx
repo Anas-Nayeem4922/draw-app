@@ -120,17 +120,16 @@ export default function Canvas({ roomId }: { roomId: string }) {
           onClick={setSelectedShape} 
           items={tools} 
           selected={selectedShape}
-          desktopClassName="mt-32" 
         />
       </div>
-      <canvas ref={canvasRef} className="bg-zinc-900" />
-      <div className="bg-zinc-900 mt-18 md:mt-0 fixed top-2 right-4 p-4 backdrop-blur-sm rounded-lg shadow-lg flex items-center z-50 gap-2">
+      <div className="bg-zinc-900 mt-18 md:mt-0 fixed top-2 right-4 p-4 backdrop-blur-sm rounded-lg shadow-lg flex items-center z-50 gap-2 max-h-fit">
           <span className="text-sm font-medium text-zinc-100">Room ID:</span>
                 <code className="bg-zinc-950 px-2 py-1 rounded text-sm">{roomId}</code>
                 <Button variant="ghost" size="icon" className="h-8 w-8" onClick={copyRoomId} title="Copy room ID">
                     {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                 </Button>
       </div>
+      <canvas ref={canvasRef} className="bg-zinc-900" />
     </div>
   )
 }

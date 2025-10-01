@@ -106,7 +106,9 @@ export class DrawingCanvas {
         });
     }
 
-    mouseDownHandler = (e: MouseEvent) => {
+    mouseDownHandler = (
+        e: MouseEvent | { offsetX: number; offsetY: number }
+    ) => {
         this.clicked = true;
         this.startX = e.offsetX;
         this.startY = e.offsetY;
@@ -117,7 +119,9 @@ export class DrawingCanvas {
         }
     };
 
-    mouseMoveHandler = (e: MouseEvent) => {
+    mouseMoveHandler = (
+        e: MouseEvent | { offsetX: number; offsetY: number }
+    ) => {
         if (!this.clicked) return;
         if (this.selectedShape !== "pencil") {
             this.init();
@@ -192,13 +196,13 @@ export class DrawingCanvas {
         }
     };
 
-    mouseUpHandler = (e: MouseEvent) => {
+    mouseUpHandler = (e: MouseEvent | { offsetX: number; offsetY: number }) => {
         this.clicked = false;
         const startX = this.startX,
             startY = this.startY;
         switch (this.selectedShape) {
             case "line":
-            case "arrow":
+            case "arrow": {
                 const data = {
                     startX,
                     startY,
@@ -207,6 +211,7 @@ export class DrawingCanvas {
                 };
                 this.shapeDetails = JSON.stringify(data);
                 break;
+            }
             case "rectangle": {
                 const data = {
                     startX,
@@ -243,15 +248,59 @@ export class DrawingCanvas {
         }
     };
 
+    touchStartHandler = (e: TouchEvent) => {
+        e.preventDefault();
+        const rect = this.canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        this.mouseDownHandler({
+            offsetX: touch.clientX - rect.left,
+            offsetY: touch.clientY - rect.top,
+        });
+    };
+
+    touchMoveHandler = (e: TouchEvent) => {
+        e.preventDefault();
+        const rect = this.canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        this.mouseMoveHandler({
+            offsetX: touch.clientX - rect.left,
+            offsetY: touch.clientY - rect.top,
+        });
+    };
+
+    touchEndHandler = (e: TouchEvent) => {
+        e.preventDefault();
+        const rect = this.canvas.getBoundingClientRect();
+        const touch = e.changedTouches[0];
+        this.mouseUpHandler({
+            offsetX: touch.clientX - rect.left,
+            offsetY: touch.clientY - rect.top,
+        });
+    };
+
     initMouseHandlers() {
         this.canvas.addEventListener("mousedown", this.mouseDownHandler);
         this.canvas.addEventListener("mouseup", this.mouseUpHandler);
         this.canvas.addEventListener("mousemove", this.mouseMoveHandler);
+
+        this.canvas.addEventListener("touchstart", this.touchStartHandler, {
+            passive: false,
+        });
+        this.canvas.addEventListener("touchmove", this.touchMoveHandler, {
+            passive: false,
+        });
+        this.canvas.addEventListener("touchend", this.touchEndHandler, {
+            passive: false,
+        });
     }
 
     destroy() {
         this.canvas.removeEventListener("mousedown", this.mouseDownHandler);
         this.canvas.removeEventListener("mouseup", this.mouseUpHandler);
         this.canvas.removeEventListener("mousemove", this.mouseMoveHandler);
+
+        this.canvas.removeEventListener("touchstart", this.touchStartHandler);
+        this.canvas.removeEventListener("touchmove", this.touchMoveHandler);
+        this.canvas.removeEventListener("touchend", this.touchEndHandler);
     }
 }
