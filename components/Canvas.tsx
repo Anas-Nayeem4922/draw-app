@@ -52,6 +52,13 @@ export default function Canvas({ roomId }: { roomId: string }) {
     if (socket) socket.send(message)
   }
 
+  const deleteShape = async() => {
+    const response = await axios.delete(`/api/shape?roomId=${roomId}`)
+    if(response.data.message != "Success") 
+      toast.error(response.data.message);
+    fetchShapes();
+  }
+
   useEffect(() => {
     if (canvasRef.current) {
       const c = new DrawingCanvas(canvasRef.current, shapes, selectedShape);
@@ -122,13 +129,19 @@ export default function Canvas({ roomId }: { roomId: string }) {
           selected={selectedShape}
         />
       </div>
-      <div className="bg-zinc-900 mt-18 md:mt-0 fixed top-2 right-4 p-4 backdrop-blur-sm rounded-lg shadow-lg flex items-center z-50 gap-2 max-h-fit">
-          <span className="text-sm font-medium text-zinc-100">Room ID:</span>
-                <code className="bg-zinc-950 px-2 py-1 rounded text-sm">{roomId}</code>
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={copyRoomId} title="Copy room ID">
-                    {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
-                </Button>
+      <div className="bg-zinc-900 mt-18 md:mt-0 fixed top-2 right-4 p-4 backdrop-blur-sm rounded-lg shadow-lg flex items-center z-50 gap-2 max-h-16">
+      <span className="text-sm font-medium text-zinc-100">Room ID:</span>
+      <div className="max-w-[200px] sm:max-w-[300px] md:max-w-[400px] truncate">
+        <code className="bg-zinc-950 px-2 py-1 rounded text-sm truncate">
+          {roomId}
+        </code>
       </div>
+      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={copyRoomId} title="Copy room ID">
+        {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+      </Button>
+      <Button className="cursor-pointer" onClick={() => deleteShape()}>Undo</Button>
+    </div>
+
       <canvas ref={canvasRef} className="bg-zinc-900" />
     </div>
   )

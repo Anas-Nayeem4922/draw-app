@@ -69,3 +69,41 @@ export async function POST(req: Request) {
         );
     }
 }
+
+export async function DELETE(req: Request) {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+        return Response.json({
+            message: "User not logged in",
+        });
+    }
+    try {
+        const { searchParams } = new URL(req.url);
+        let roomId = searchParams.get("roomId") as string;
+        const lastShape = await client.shape.findFirst({
+            where: {
+                roomId,
+            },
+            orderBy: {
+                id: "desc",
+            },
+        });
+        if (!lastShape) {
+            return Response.json({
+                message: "No shape exists",
+            });
+        }
+        await client.shape.delete({
+            where: {
+                id: lastShape.id,
+            },
+        });
+        return Response.json({
+            message: "Success",
+        });
+    } catch (err) {
+        return Response.json({
+            message: "Error in undoing",
+        });
+    }
+}
