@@ -11,13 +11,17 @@ export class DrawingCanvas {
     private selectedShape: string;
     private shapeDetails: string;
     private points: Point[];
+    private strokeColour: string;
+    private strokeWidth: number;
 
     onShapeComplete?: (shape: string, details: string) => void;
 
     constructor(
         canvas: HTMLCanvasElement,
         shapes: Shape[],
-        selectedShape: string
+        selectedShape: string,
+        strokeColour: string,
+        strokeWidth: number
     ) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
@@ -26,8 +30,10 @@ export class DrawingCanvas {
         this.selectedShape = selectedShape;
         this.shapeDetails = "";
         this.points = [];
-        this.ctx.strokeStyle = "#ffffff";
-        this.ctx.lineWidth = 2;
+        this.strokeColour = strokeColour;
+        this.strokeWidth = strokeWidth;
+        this.ctx.strokeStyle = strokeColour;
+        this.ctx.lineWidth = strokeWidth;
         this.ctx.lineCap = "round";
 
         this.init();
@@ -41,34 +47,65 @@ export class DrawingCanvas {
             const data = JSON.parse(shape.shapeDetails);
             switch (shape.shape) {
                 case "line": {
-                    const { startX, startY, endX, endY } = data;
+                    const {
+                        startX,
+                        startY,
+                        endX,
+                        endY,
+                        strokeColour,
+                        strokeWidth,
+                    } = data;
                     this.ctx.beginPath();
                     this.ctx.moveTo(startX, startY);
                     this.ctx.lineTo(endX, endY);
-                    this.ctx.strokeStyle = "#ffffff";
+                    this.ctx.strokeStyle = strokeColour;
+                    this.ctx.lineWidth = strokeWidth;
                     this.ctx.stroke();
                     break;
                 }
                 case "rectangle": {
-                    const { startX, startY, height, width } = data;
-                    this.ctx.strokeStyle = "#ffffff";
+                    const {
+                        startX,
+                        startY,
+                        height,
+                        width,
+                        strokeColour,
+                        strokeWidth,
+                    } = data;
+                    this.ctx.strokeStyle = strokeColour;
+                    this.ctx.lineWidth = strokeWidth;
                     this.ctx.strokeRect(startX, startY, width, height);
                     break;
                 }
                 case "circle": {
-                    const { startX, startY, radius } = data;
+                    const {
+                        startX,
+                        startY,
+                        radius,
+                        strokeColour,
+                        strokeWidth,
+                    } = data;
                     this.ctx.beginPath();
                     this.ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
-                    this.ctx.strokeStyle = "#ffffff";
+                    this.ctx.strokeStyle = strokeColour;
+                    this.ctx.lineWidth = strokeWidth;
                     this.ctx.stroke();
                     break;
                 }
                 case "arrow": {
-                    const { startX, startY, endX, endY } = data;
+                    const {
+                        startX,
+                        startY,
+                        endX,
+                        endY,
+                        strokeColour,
+                        strokeWidth,
+                    } = data;
                     this.ctx.beginPath();
                     this.ctx.moveTo(startX, startY);
                     this.ctx.lineTo(endX, endY);
-                    this.ctx.strokeStyle = "#ffffff";
+                    this.ctx.strokeStyle = strokeColour;
+                    this.ctx.lineWidth = strokeWidth;
                     this.ctx.stroke();
                     const arrowHeadSize = 15;
                     const angle = Math.atan2(endY - startY, endX - startX);
@@ -89,7 +126,7 @@ export class DrawingCanvas {
                     break;
                 }
                 case "pencil": {
-                    const { points } = data;
+                    const { points, strokeColour, strokeWidth } = data;
                     this.ctx.beginPath();
                     points.forEach((point: Point, index: number) => {
                         if (index === 0) {
@@ -98,7 +135,8 @@ export class DrawingCanvas {
                             this.ctx.lineTo(point.x, point.y);
                         }
                     });
-                    this.ctx.strokeStyle = "#ffffff";
+                    this.ctx.strokeStyle = strokeColour;
+                    this.ctx.lineWidth = strokeWidth;
                     this.ctx.stroke();
                     break;
                 }
@@ -115,6 +153,7 @@ export class DrawingCanvas {
 
         if (this.selectedShape === "pencil") {
             this.ctx.beginPath();
+            this.ctx.lineWidth = this.strokeWidth;
             this.ctx.moveTo(this.startX, this.startY);
         }
     };
@@ -127,18 +166,22 @@ export class DrawingCanvas {
             this.init();
         }
         const startX = this.startX,
-            startY = this.startY;
+            startY = this.startY,
+            strokeColour = this.strokeColour,
+            strokeWidth = this.strokeWidth;
         switch (this.selectedShape) {
             case "line": {
                 this.ctx.beginPath();
                 this.ctx.moveTo(startX, startY);
                 this.ctx.lineTo(e.offsetX, e.offsetY);
-                this.ctx.strokeStyle = "#ffffff";
+                this.ctx.strokeStyle = strokeColour;
+                this.ctx.lineWidth = strokeWidth;
                 this.ctx.stroke();
                 break;
             }
             case "rectangle": {
-                this.ctx.strokeStyle = "#ffffff";
+                this.ctx.strokeStyle = strokeColour;
+                this.ctx.lineWidth = strokeWidth;
                 this.ctx.strokeRect(
                     startX,
                     startY,
@@ -154,7 +197,8 @@ export class DrawingCanvas {
                 );
                 this.ctx.beginPath();
                 this.ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
-                this.ctx.strokeStyle = "#ffffff";
+                this.ctx.strokeStyle = strokeColour;
+                this.ctx.lineWidth = strokeWidth;
                 this.ctx.stroke();
                 break;
             }
@@ -164,7 +208,8 @@ export class DrawingCanvas {
                 this.ctx.beginPath();
                 this.ctx.moveTo(startX, startY);
                 this.ctx.lineTo(endX, endY);
-                this.ctx.strokeStyle = "#ffffff";
+                this.ctx.strokeStyle = strokeColour;
+                this.ctx.lineWidth = strokeWidth;
                 this.ctx.stroke();
                 const arrowHeadSize = 15;
                 const angle = Math.atan2(endY - startY, endX - startX);
@@ -187,7 +232,8 @@ export class DrawingCanvas {
             case "pencil": {
                 this.ctx.lineTo(e.offsetX, e.offsetY);
                 this.points?.push({ x: e.offsetX, y: e.offsetY });
-                this.ctx.strokeStyle = "#ffffff";
+                this.ctx.strokeStyle = strokeColour;
+                this.ctx.lineWidth = strokeWidth;
                 this.ctx.lineWidth = 2;
                 this.ctx.lineCap = "round";
                 this.ctx.stroke();
@@ -199,7 +245,9 @@ export class DrawingCanvas {
     mouseUpHandler = (e: MouseEvent | { offsetX: number; offsetY: number }) => {
         this.clicked = false;
         const startX = this.startX,
-            startY = this.startY;
+            startY = this.startY,
+            strokeColour = this.strokeColour,
+            strokeWidth = this.strokeWidth;
         switch (this.selectedShape) {
             case "line":
             case "arrow": {
@@ -208,6 +256,8 @@ export class DrawingCanvas {
                     startY,
                     endX: e.offsetX,
                     endY: e.offsetY,
+                    strokeColour,
+                    strokeWidth,
                 };
                 this.shapeDetails = JSON.stringify(data);
                 break;
@@ -218,6 +268,8 @@ export class DrawingCanvas {
                     startY,
                     width: e.offsetX - startX,
                     height: e.offsetY - startY,
+                    strokeColour,
+                    strokeWidth,
                 };
                 this.shapeDetails = JSON.stringify(data);
                 break;
@@ -230,6 +282,8 @@ export class DrawingCanvas {
                         Math.pow(e.offsetX - startX, 2) +
                             Math.pow(e.offsetY - startY, 2)
                     ),
+                    strokeColour,
+                    strokeWidth,
                 };
                 this.shapeDetails = JSON.stringify(data);
                 break;
@@ -237,6 +291,8 @@ export class DrawingCanvas {
             case "pencil": {
                 const data = {
                     points: this.points,
+                    strokeColour,
+                    strokeWidth,
                 };
                 this.shapeDetails = JSON.stringify(data);
                 this.points = [];
